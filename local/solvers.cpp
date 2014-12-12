@@ -48,8 +48,8 @@ void solve_1d(int N, double *x, double L)
 void solve_2d(int ny, int nx, double *x, double Ly, double Lx)
 {
 
-	fftw_complex *out, *in;
-	//double *in;
+	fftw_complex *out;
+	double *in;
 	fftw_plan p, pi;
 	const double tplx  = 2*M_PI/Lx;
 	const double tplx2 = tplx*tplx;
@@ -58,16 +58,11 @@ void solve_2d(int ny, int nx, double *x, double Ly, double Lx)
 	
 	// Size of complex array
 	const int nyc = ny;
-	const int nxc = nx;//(int)(floor(nx/2)+1);
+	const int nxc = (int)(floor(nx/2)+1);
 
 	std::vector<double> kx2_vals(nxc, 0);
 	for(int i=0; i<kx2_vals.size(); i++)
-	{
-		if(2*i<nx)
-			kx2_vals[i] = i*i*tplx2;
-		else
-			kx2_vals[i] = (nx-i)*(nx-i)*tplx2;
-	}
+		kx2_vals[i] = i*i*tplx2;
 
 	std::vector<double> ky2_vals(nyc, 0);
 	for(int i=0; i<ky2_vals.size(); i++)
@@ -78,20 +73,14 @@ void solve_2d(int ny, int nx, double *x, double Ly, double Lx)
 			ky2_vals[i] = (ny-i)*(ny-i)*tply2;
 	}
 
-	//in  = (double*)fftw_malloc(sizeof(double)*nx*ny);
-	in  = (fftw_complex*)fftw_malloc(sizeof(fftw_complex)*nx*ny);
+	in  = (double*)fftw_malloc(sizeof(double)*nx*ny);
 	out = (fftw_complex*)fftw_malloc(sizeof(fftw_complex)*nxc*nyc);
 
-	// p  = fftw_plan_dft_r2c_2d(ny,  nx,  in, out, FFTW_ESTIMATE);
-	// pi = fftw_plan_dft_c2r_2d(nyc, nxc, out, in, FFTW_ESTIMATE);
-	p  = fftw_plan_dft_2d(ny,  nx,  in, out, FFTW_FORWARD,  FFTW_ESTIMATE);
-	pi = fftw_plan_dft_2d(nyc, nxc, out, in, FFTW_BACKWARD, FFTW_ESTIMATE);
+	p  = fftw_plan_dft_r2c_2d(ny,  nx,  in, out, FFTW_ESTIMATE);
+	pi = fftw_plan_dft_c2r_2d(ny, nx, out, in, FFTW_ESTIMATE);
 
 	for(int i=0; i<ny*nx; i++)
-	{
-		in[i][0] = x[i];
-		in[i][1] = 0;
-	}
+		in[i] = x[i];
 
 	fftw_execute(p);
 
@@ -114,7 +103,7 @@ void solve_2d(int ny, int nx, double *x, double Ly, double Lx)
 	fftw_execute(pi);
 
 	for(int i=0; i<ny*nx; i++)
-		x[i] = in[i][0]/(ny*nx);
+		x[i] = in[i]/(ny*nx);
 
 	fftw_free(in); fftw_free(out);
 	
