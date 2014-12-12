@@ -25,7 +25,7 @@ LFLAGS    = $(LINKOPTS) $(LIBS) -lstdc++
 .cxx.o:
 	$(CXX) $(CXXFLAGS) -c $<
 
-ALLPROGS = ex3
+ALLPROGS = ex3 ex5
 
 all: $(ALLPROGS)
 
@@ -34,6 +34,12 @@ ex3: ex3.o
 
 run-ex3: ex3
 	mpirun -np 16 ex3 -n 33 -solver 0 -v 1 1
+
+ex5: ex5.o
+	$(CC) -o $@ $^ $(LFLAGS)
+
+run-ex5: ex5
+	 mpirun -np 4 ex5
 
 clean:
 	rm -vf *.o $(ALLPROGS)
