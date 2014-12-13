@@ -17,6 +17,15 @@ cdef extern from "fftwlocal.hpp":
 cdef extern from "problem.hpp":
 
     void build_problem(double *x,
+                       int xstart, int nx, double dx,
+                       double k)
+
+    void build_solution(double *x,
+                        int xstart, int nx, double dx,
+                        double k)
+
+
+    void build_problem(double *x,
                        int ystart, int ny, double dy,
                        int xstart, int nx, double dx,
                        double k)
@@ -43,6 +52,17 @@ def solve3d(double[:,:,:] x, double Lz, double Ly, double Lx):
     ny = x.shape[1]
     nx = x.shape[2]
     solve_3d(nz, ny, nx, &x[0,0,0], Lz, Ly, Lx)
+
+def problem_setup_1d(int xstart, int nx, double dx,
+                     double k):
+
+    cdef double[:] x = np.zeros(nx, dtype=np.double)
+    cdef double[:] s = np.zeros(nx, dtype=np.double)
+
+    build_problem(&x[0],  xstart, nx, dx, k)
+    build_solution(&s[0], xstart, nx, dx, k)
+
+    return (np.array(x), np.array(s))
 
 def problem_setup_2d(int ystart, int ny, double dy,
                      int xstart, int nx, double dx,
