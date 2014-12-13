@@ -1,10 +1,10 @@
 
-CXX      = g++
+CXX      = mpic++
 CXXFLAGS = -g -fPIC
-LDLIBS = -lfftw3 -lm
+LDLIBS = -lfftw3_mpi -lfftw3 -lm
 
-DEPS = problem.hpp fftwlocal.hpp
-OBJS = problem.o fftwlocal.o
+DEPS = problem.hpp fftwlocal.hpp fftwmpi.hpp mpi_stats.hpp
+OBJS = problem.o fftwlocal.o fftwmpi.o mpi_stats.o
 
 testsolvers: testsolvers.pyx $(OBJS) $(DEPS)
 	python setup.py build_ext --inplace

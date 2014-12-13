@@ -1,10 +1,19 @@
 
+from collections import namedtuple, Iterable
 import numpy as np
 cimport numpy as np
 import scipy as sp
 from libc.math cimport floor, ceil, exp, erf, fabs, sqrt, cos, sin
+from libcpp cimport bool
 
 ctypedef np.float64_t DOUBLE
+
+cdef extern from "mpi_stats.hpp":
+    bool check_mpi()
+    int get_rank()
+    int get_comm_size()
+    int thread_level()
+    bool has_thread_multiple()
 
 cdef extern from "fftwlocal.hpp":
 
@@ -47,7 +56,12 @@ cdef extern from "problem.hpp":
                         int xstart, int nx, double dx,
                         double k)
 
+MPIStats = namedtuple("MPIStats", ["check_mpi", "rank", "size",
+                                   "thread_level", "has_thread_multiple"])
 
+def mpi_stats():
+    return MPIStats(check_mpi(), get_rank(), get_comm_size(),
+                    thread_level(), has_thread_multiple())
 
 def solve1d(double[:] x, double L):
     cdef int N = len(x)
