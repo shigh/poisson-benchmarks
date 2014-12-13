@@ -1,5 +1,15 @@
 
-#include "fftwlocal.hpp"
+#include "fftwmpi.hpp"
+
+void setup_fftw_mpi()
+{
+	fftw_mpi_init();
+}
+
+void cleanup_fftw_mpi()
+{
+	fftw_mpi_cleanup();
+}
 
 void solve_1d_mpi(int N, double *x, double L)
 {
