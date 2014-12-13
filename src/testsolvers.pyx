@@ -35,6 +35,19 @@ cdef extern from "problem.hpp":
                         int xstart, int nx, double dx,
                         double k)
 
+    void build_problem(double *x,
+                       int zstart, int nz, double dz,
+                       int ystart, int ny, double dy,
+                       int xstart, int nx, double dx,
+                       double k)
+
+    void build_solution(double *x,
+                        int zstart, int nz, double dz,
+                        int ystart, int ny, double dy,
+                        int xstart, int nx, double dx,
+                        double k)
+
+
 
 def solve1d(double[:] x, double L):
     cdef int N = len(x)
@@ -75,3 +88,17 @@ def problem_setup_2d(int ystart, int ny, double dy,
     build_solution(&s[0,0], ystart, ny, dy, xstart, nx, dx, k)
 
     return (np.array(x), np.array(s))
+
+def problem_setup_3d(int zstart, int nz, double dz,
+                     int ystart, int ny, double dy,
+                     int xstart, int nx, double dx,
+                     double k):
+
+    cdef double[:,:,:] x = np.zeros((nz, ny, nx), dtype=np.double)
+    cdef double[:,:,:] s = np.zeros((nz, ny, nx), dtype=np.double)
+
+    build_problem(&x[0,0,0],  zstart, nz, dz, ystart, ny, dy, xstart, nx, dx, k)
+    build_solution(&s[0,0,0], zstart, nz, dz, ystart, ny, dy, xstart, nx, dx, k)
+
+    return (np.array(x), np.array(s))
+    

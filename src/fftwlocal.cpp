@@ -169,7 +169,7 @@ void solve_3d(int nz, int ny, int nx, double *x, double Lz, double Ly, double Lx
 			for(int i=0; i<nxc; i++)
 			{
 				ind = k*nxc*nyc+j*nxc+i;
-				k2 = ky2_vals[j] + kx2_vals[i];
+				k2 = kz2_vals[i] + ky2_vals[j] + kx2_vals[i];
 				if(i!=0 || j!=0)
 				{
 					out[ind][0] = out[ind][0]/k2;
