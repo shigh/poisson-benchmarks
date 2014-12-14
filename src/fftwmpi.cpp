@@ -112,6 +112,8 @@ FFTWPoisson2DMPI::~FFTWPoisson2DMPI()
 
 	fftw_free(in);
 	fftw_free(out);
+	fftw_destroy_plan(p);
+	fftw_destroy_plan(pi);
 
 }
 
@@ -238,5 +240,7 @@ FFTWPoisson3DMPI::~FFTWPoisson3DMPI()
 
 	fftw_free(in);
 	fftw_free(out);
+	fftw_destroy_plan(p);
+	fftw_destroy_plan(pi);
 
 }
