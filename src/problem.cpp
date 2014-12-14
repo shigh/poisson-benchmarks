@@ -71,7 +71,7 @@ void build_problem(double *x,
 	for(int m=0; m<nz; m++)
 		for(int j=0; j<ny; j++)
 			for(int i=0; i<nx; i++)
-				x[j*nx+i] = sin(kdx*(xstart+i))*sin(kdy*(ystart+j))*sin(kdz*(zstart+m));
+				x[(m*ny+j)*nx+i] = sin(kdx*(xstart+i))*sin(kdy*(ystart+j))*sin(kdz*(zstart+m));
 
 }
 
@@ -90,6 +90,6 @@ void build_solution(double *x,
 	for(int m=0; m<nz; m++)
 		for(int j=0; j<ny; j++)
 			for(int i=0; i<nx; i++)
-				x[j*nx+i] = s*sin(kdx*(xstart+i))*sin(kdy*(ystart+j))*sin(kdz*(zstart+m));
+				x[(m*ny+j)*nx+i] = s*sin(kdx*(xstart+i))*sin(kdy*(ystart+j))*sin(kdz*(zstart+m));
 
 }
