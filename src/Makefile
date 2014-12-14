@@ -21,4 +21,4 @@ run-test: test
 clean:
 	rm -vf *.o *.so testsolvers.cpp
 	rm -vrf build
-	rm -vf test
+	rm -vf test tmp.py

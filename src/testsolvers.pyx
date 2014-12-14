@@ -5,6 +5,7 @@ cimport numpy as np
 import scipy as sp
 from libc.math cimport floor, ceil, exp, erf, fabs, sqrt, cos, sin
 from libcpp cimport bool
+import mpi4py
 
 ctypedef np.float64_t DOUBLE
 
@@ -55,6 +56,77 @@ cdef extern from "problem.hpp":
                         int ystart, int ny, double dy,
                         int xstart, int nx, double dx,
                         double k)
+
+cdef extern from "fftwmpi.hpp":
+
+    void setup_fftw_mpi()
+
+    cdef cppclass FFTWPoisson2DMPI:
+
+        FFTWPoisson2DMPI(ptrdiff_t N0, double Ly,
+                         ptrdiff_t N1, double Lx) except +
+
+        void solve(double *x)
+        int get_nx()
+        int get_ny()
+        int get_y0()
+
+    cdef cppclass FFTWPoisson3DMPI:
+
+        FFTWPoisson3DMPI(ptrdiff_t N0, double Lz,
+                         ptrdiff_t N1, double Ly,
+                         ptrdiff_t N2, double Lx) except +
+
+        void solve(double *x)
+        int get_nx()
+        int get_ny()
+        int get_nz()
+        int get_z0()
+
+
+cdef class PyFFTWPoisson2DMPI:
+    cdef FFTWPoisson2DMPI *thisptr
+    def __cinit__(self,
+                  ptrdiff_t N0, double Ly,
+                  ptrdiff_t N1, double Lx):
+        setup_fftw_mpi()
+        self.thisptr = new FFTWPoisson2DMPI(N0, Ly, N1, Lx)
+    def __dealloc__(self):
+        del self.thisptr
+    property nx:
+        def __get__(self): return self.thisptr.get_nx()
+    property ny:
+        def __get__(self): return self.thisptr.get_ny()
+    property y0:
+        def __get__(self): return self.thisptr.get_y0()
+    
+    def solve(self, double[:,:] x):
+        self.thisptr.solve(&x[0,0])
+        
+
+cdef class PyFFTWPoisson3DMPI:
+    cdef FFTWPoisson3DMPI *thisptr
+    def __cinit__(self,
+                  ptrdiff_t N0, double Lz,
+                  ptrdiff_t N1, double Ly,
+                  ptrdiff_t N2, double Lx):
+        setup_fftw_mpi()
+        self.thisptr = new FFTWPoisson3DMPI(N0, Lz, N1, Ly, N2, Lx)
+    def __dealloc__(self):
+        del self.thisptr
+    property nx:
+        def __get__(self): return self.thisptr.get_nx()
+    property ny:
+        def __get__(self): return self.thisptr.get_ny()
+    property nz:
+        def __get__(self): return self.thisptr.get_nz()
+    property z0:
+        def __get__(self): return self.thisptr.get_z0()
+    
+    def solve(self, double[:,:,:] x):
+        self.thisptr.solve(&x[0,0,0])
+        
+
 
 MPIStats = namedtuple("MPIStats", ["check_mpi", "rank", "size",
                                    "thread_level", "has_thread_multiple"])
