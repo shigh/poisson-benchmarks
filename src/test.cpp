@@ -102,6 +102,12 @@ void hypre_example_2d()
 
 	solver.solve(&x[0]);
 
+	// I want to make sure that it works multiple times.
+	// It is not always clear from the hypre function calls
+	// that this will work as expected
+	build_problem(x, y0+1, ny, dy, 1, nx, dx, 10);
+	solver.solve(&x[0]);
+
 	int num_iterations = solver.get_num_iterations();
 	double final_res_norm = solver.get_final_res_norm();
 
