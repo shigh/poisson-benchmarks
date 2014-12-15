@@ -6,8 +6,6 @@
 #include "HYPRE.h"
 #include "HYPRE_parcsr_ls.h"
 
-int hypre_solve ();
-
 class HypreSolver2D
 {
 

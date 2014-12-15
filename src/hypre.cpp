@@ -196,24 +196,3 @@ HypreSolver2D::~HypreSolver2D()
 	HYPRE_IJVectorDestroy(hv_x);
 	HYPRE_BoomerAMGDestroy(solver);
 }
-
-
-
-int hypre_solve ()
-{
-
-	HypreSolver2D solver(33, 1., 33, 1.);
-
-	std::vector<double> x(solver.get_local_size(), 1);
-	solver.solve(&x[0]);
-
-	int num_iterations = solver.get_num_iterations();
-	double final_res_norm = solver.get_final_res_norm();
-
-	std::cout <<  num_iterations << ' '
-			  << final_res_norm << std::endl;
-
-
-	return(0);
-}
-
