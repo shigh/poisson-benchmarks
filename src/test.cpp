@@ -2,6 +2,7 @@
 
 #include "fftwmpi.hpp"
 #include "problem.hpp"
+#include "hypre.hpp"
 
 void example_2d()
 {
@@ -85,6 +86,8 @@ int main(int argc, char* argv[])
 	example_2d();
 
 	example_3d();
+
+	hypre_solve(argc, argv);
 
 	MPI_Finalize();
 

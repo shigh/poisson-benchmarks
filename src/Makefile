@@ -1,11 +1,17 @@
 
-CXX      = mpic++
-CXXFLAGS = -g -fPIC
+HYPRE_DIR = /home/user01/src/hypre-2.9.0b-babel/src/hypre
+
+CXX         = mpic++
+CXXFLAGS    = -g -fPIC
+CXXINCLUDES = -I$(HYPRE_DIR)/include
+CXXDEFS     = -DHAVE_CONFIG_H -DHYPRE_TIMING
+
 LDLIBS  = -L/home/shigh2/src/fftw/lib
 LDLIBS += -lfftw3_mpi -lfftw3 -lm
+LDLIBS += -L$(HYPRE_DIR)/lib -lHYPRE -lm
 
-DEPS = problem.hpp fftwlocal.hpp fftwmpi.hpp mpi_stats.hpp
-OBJS = problem.o fftwlocal.o fftwmpi.o mpi_stats.o
+DEPS = problem.hpp fftwlocal.hpp fftwmpi.hpp mpi_stats.hpp hypre.hpp
+OBJS = problem.o fftwlocal.o fftwmpi.o mpi_stats.o hypre.o
 
 testsolvers: testsolvers.pyx $(OBJS) $(DEPS)
 	python setup.py build_ext --inplace
@@ -16,8 +22,11 @@ test: test.o $(OBJS)
 run-test: test
 	mpirun -n 2 ./test
 
+test.o : test.cpp
+	$(CXX) $(CXXFLAGS) $(CXXINCLUDES) -o $@ -c $<
+
 %.o : %.cpp %.hpp
-	$(CXX) $(CXXFLAGS) -o $@ -c $<
+	$(CXX) $(CXXFLAGS) $(CXXINCLUDES) -o $@ -c $<
 
 clean:
 	rm -vf *.o *.so testsolvers.cpp
