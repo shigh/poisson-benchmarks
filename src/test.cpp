@@ -133,9 +133,9 @@ void hypre_example_3d()
 	const ptrdiff_t N1 = 100;
 	const ptrdiff_t N2 = 100;
 
-	const double dz = Lz/N0;
-	const double dy = Ly/N1;
-	const double dx = Lx/N2;
+	const double dz = Lz/(N0+1);
+	const double dy = Ly/(N1+1);
+	const double dx = Lx/(N2+1);
 
 	HypreSolver3D solver(N0, Lz, N1, Ly, N2, Lx);
 
@@ -146,8 +146,8 @@ void hypre_example_3d()
 
 	double *x = new double[nx*ny*nz];
 	double *s = new double[nx*ny*nz];
-	build_problem(x, z0, nz, dz, 0, ny, dy, 0, nx, dx, 10);
-	build_solution(s, z0, nz, dz, 0, ny, dy, 0, nx, dx, 10);
+	build_problem(x, z0+1, nz, dz, 1, ny, dy, 1, nx, dx, 10);
+	build_solution(s, z0+1, nz, dz, 1, ny, dy, 1, nx, dx, 10);
 
 	solver.solve(x);
 
