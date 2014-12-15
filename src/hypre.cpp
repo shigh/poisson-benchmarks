@@ -10,8 +10,9 @@ HypreSolver2D::HypreSolver2D(ptrdiff_t N0_, double Ly_, ptrdiff_t N1_, double Lx
 	MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
 
 	N = N0*N1;
-	h = Ly/(N0+1);
-	h2 = h*h;
+	dy = Ly/(N0+1);
+	dx = Lx/(N1+1);
+	h2 = dy*dy;
 	nx = N1;
 
 	int yp    = (int)(N0/num_procs);

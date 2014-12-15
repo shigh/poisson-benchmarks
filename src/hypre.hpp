@@ -16,14 +16,14 @@ private:
 	int i;
 	int myid, num_procs;
 	int N, N0, N1;
-	double Ly, Lx;
+	double Ly, Lx, dy, dx;
 
 	int ilower, iupper, y0, ny, nx;
 	int local_size, extra;
 	int num_iterations;
 	double final_res_norm;
 
-	double h, h2;
+	double h2;
 
 	HYPRE_IJMatrix A;
 	HYPRE_ParCSRMatrix parcsr_A;
