@@ -1,5 +1,6 @@
 
 #include <math.h>
+#include <vector>
 #include "_hypre_utilities.h"
 #include "HYPRE_krylov.h"
 #include "HYPRE.h"
