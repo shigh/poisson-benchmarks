@@ -13,17 +13,24 @@ HypreSolver2D::HypreSolver2D()
 	N = n*n; /* global number of rows */
 	h = 1.0/(n+1); /* mesh size*/
 	h2 = h*h;
+	nx = n;
 
-	local_size = N/num_procs;
-	extra = N - local_size*num_procs;
+	int yp    = (int)(n/num_procs);
+	int extra = n-yp*num_procs;
+	if(myid<extra)
+	{
+		y0 = myid*yp + myid;
+		ny = yp+1;
+	}
+	else
+	{
+		y0 = myid*yp + extra;
+		ny = yp;
+	}
 
-	ilower = local_size*myid;
-	ilower += hypre_min(myid, extra);
-
-	iupper = local_size*(myid+1);
-	iupper += hypre_min(myid+1, extra);
-	iupper = iupper - 1;
-	local_size = iupper - ilower + 1;
+	local_size = ny*nx;
+	ilower     = y0*nx;
+	iupper     = ilower+local_size-1;
 
 	// Build rhs and init x
 	HYPRE_IJVectorCreate(MPI_COMM_WORLD, ilower, iupper, &hv_b);
@@ -170,6 +177,16 @@ double HypreSolver2D::get_final_res_norm()
 int HypreSolver2D::get_local_size()
 {
 	return local_size;
+}
+
+int HypreSolver2D::get_y0()
+{
+	return y0;
+}
+
+int HypreSolver2D::get_ny()
+{
+	return ny;
 }
 
 HypreSolver2D::~HypreSolver2D()

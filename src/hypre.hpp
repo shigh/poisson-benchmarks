@@ -17,7 +17,7 @@ private:
 	int myid, num_procs;
 	int N, n;
 
-	int ilower, iupper;
+	int ilower, iupper, y0, ny, nx;
 	int local_size, extra;
 	int num_iterations;
 	double final_res_norm;
@@ -55,6 +55,8 @@ public:
 	double get_final_res_norm();
 
 	int get_local_size();
+	int get_y0();
+	int get_ny();
 
 	~HypreSolver2D();
 
