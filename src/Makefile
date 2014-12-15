@@ -1,13 +1,10 @@
 
-HYPRE_DIR = /home/user01/src/hypre
-
 CXX         = mpic++
 CXXFLAGS    = -g -fPIC
-CXXINCLUDES = -I$(HYPRE_DIR)/include
+CXXINCLUDES = -I$(HYPRE_DIR)/include -I$(FFTW_DIR)/include
 CXXDEFS     = -DHAVE_CONFIG_H -DHYPRE_TIMING
 
-LDLIBS  = -L/home/shigh2/src/fftw/lib
-LDLIBS += -lfftw3_mpi -lfftw3 -lm
+LDLIBS  = -L$(FFTW_DIR)/lib  -lfftw3_mpi -lfftw3 -lm
 LDLIBS += -L$(HYPRE_DIR)/lib -lHYPRE 
 
 DEPS = problem.hpp fftwlocal.hpp fftwmpi.hpp mpi_stats.hpp hypre.hpp

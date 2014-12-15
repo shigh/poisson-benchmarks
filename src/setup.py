@@ -4,11 +4,14 @@ from Cython.Distutils import build_ext
 import os
 import numpy as np
 
+HYPRE_DIR = os.environ["HYPRE_DIR"]
+FFTW_DIR  = os.environ["FFTW_DIR"]
+
 mpi_compile_args = os.popen("mpic++ --showme:compile").read().strip().split(' ')
 mpi_link_args    = os.popen("mpic++ --showme:link").read().strip().split(' ')
-compile_args = ["-I/home/user01/src/hypre/include"]
-link_args = ["-L/home/shigh2/src/fftw/lib", "-lfftw3", "-lfftw3_mpi", "-lm",
-             "-L/home/user01/src/hypre/lib", "-lHYPRE"]
+compile_args = ["-I%s/include"%(HYPRE_DIR,), "-I%s/include"%(FFTW_DIR,)]
+link_args = ["-L%s/lib"%(FFTW_DIR,), "-lfftw3", "-lfftw3_mpi", "-lm",
+             "-L%s/lib"%(HYPRE_DIR,), "-lHYPRE"]
 
 setup(
     cmdclass = {'build_ext':build_ext},
