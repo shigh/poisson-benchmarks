@@ -31,7 +31,6 @@ private:
 
 	HYPRE_Solver solver, precond;
 
-	std::vector<double> rhs_values, x_values;
 	std::vector<int> rows;
 
 	void set_rhs(double *rhs);	

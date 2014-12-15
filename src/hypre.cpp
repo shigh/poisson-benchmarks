@@ -38,16 +38,12 @@ HypreSolver2D::HypreSolver2D(ptrdiff_t N0_, double Ly_, ptrdiff_t N1_, double Lx
 	HYPRE_IJVectorCreate(MPI_COMM_WORLD, ilower, iupper, &hv_x);
 	HYPRE_IJVectorSetObjectType(hv_x, HYPRE_PARCSR);
 
-	rhs_values.resize(local_size);
-	x_values.resize(local_size);
+	std::vector<double> rhs_values(local_size, 1.);
+	std::vector<double> x_values(local_size, 0.);
 	rows.resize(local_size);
 
 	for (int i=0; i<local_size; i++)
-	{
-		rhs_values[i] = h2;
-		x_values[i] = 0.0;
 		rows[i] = ilower + i;
-	}
 
 	set_x0(&x_values[0]);
 	set_rhs(&rhs_values[0]);
