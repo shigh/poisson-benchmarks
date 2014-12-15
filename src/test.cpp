@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
 
 	example_3d();
 
-	hypre_solve(argc, argv);
+	hypre_solve();
 
 	MPI_Finalize();
 

@@ -5,4 +5,4 @@
 #include "HYPRE.h"
 #include "HYPRE_parcsr_ls.h"
 
-int hypre_solve (int argc, char *argv[]);
+int hypre_solve ();

@@ -1,7 +1,7 @@
 
 #include "hypre.hpp"
 
-int hypre_solve (int argc, char *argv[])
+int hypre_solve ()
 {
    int i;
    int myid, num_procs;
@@ -29,47 +29,6 @@ int hypre_solve (int argc, char *argv[])
    /* Default problem parameters */
    n = 33;
    print_system = 0;
-
-
-   /* Parse command line */
-   {
-      int arg_index = 0;
-      int print_usage = 0;
-
-      while (arg_index < argc)
-      {
-         if ( strcmp(argv[arg_index], "-n") == 0 )
-         {
-            arg_index++;
-            n = atoi(argv[arg_index++]);
-         }
-         else if ( strcmp(argv[arg_index], "-print_system") == 0 )
-         {
-            arg_index++;
-            print_system = 1;
-         }
-         else if ( strcmp(argv[arg_index], "-help") == 0 )
-         {
-            print_usage = 1;
-            break;
-         }
-         else
-         {
-            arg_index++;
-         }
-      }
-
-      if ((print_usage) && (myid == 0))
-      {
-         printf("\n");
-         printf("Usage: %s [<options>]\n", argv[0]);
-         printf("\n");
-         printf("  -n <n>              : problem size in each direction (default: 33)\n");
-         printf("  -print_system       : print the matrix and rhs\n");
-         printf("\n");
-      }
-
-   }
 
    /* Preliminaries: want at least one processor per row */
    if (n*n < num_procs) n = sqrt(num_procs) + 1;
