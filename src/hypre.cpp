@@ -2,21 +2,20 @@
 #include "hypre.hpp"
 
 
-HypreSolver2D::HypreSolver2D()
+HypreSolver2D::HypreSolver2D(ptrdiff_t N0_, double Ly_, ptrdiff_t N1_, double Lx_):
+	N0(N0_), Ly(Ly_), N1(N1_), Lx(Lx_)
 {
+
 	MPI_Comm_rank(MPI_COMM_WORLD, &myid);
 	MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
 
-	/* Default problem parameters */
-	n = 33;
-
-	N = n*n; /* global number of rows */
-	h = 1.0/(n+1); /* mesh size*/
+	N = N0*N1;
+	h = Ly/(N0+1);
 	h2 = h*h;
-	nx = n;
+	nx = N1;
 
-	int yp    = (int)(n/num_procs);
-	int extra = n-yp*num_procs;
+	int yp    = (int)(N0/num_procs);
+	int extra = N0-yp*num_procs;
 	if(myid<extra)
 	{
 		y0 = myid*yp + myid;
@@ -120,15 +119,15 @@ void HypreSolver2D::build_A()
 		nnz = 0;
 
 		// North
-		if ((i-n)>=0)
+		if ((i-N1)>=0)
 		{
-			cols[nnz] = i-n;
+			cols[nnz] = i-N1;
 			values[nnz] = -1.0;
 			nnz++;
 		}
 
 		// Left
-		if (i%n)
+		if (i%N1)
 		{
 			cols[nnz] = i-1;
 			values[nnz] = -1.0;
@@ -141,7 +140,7 @@ void HypreSolver2D::build_A()
 		nnz++;
 
 		// Right
-		if ((i+1)%n)
+		if ((i+1)%N1)
 		{
 			cols[nnz] = i+1;
 			values[nnz] = -1.0;
@@ -149,9 +148,9 @@ void HypreSolver2D::build_A()
 		}
 
 		// South
-		if ((i+n)< N)
+		if ((i+N1)<N)
 		{
-			cols[nnz] = i+n;
+			cols[nnz] = i+N1;
 			values[nnz] = -1.0;
 			nnz++;
 		}
@@ -202,7 +201,7 @@ HypreSolver2D::~HypreSolver2D()
 int hypre_solve ()
 {
 
-	HypreSolver2D solver;
+	HypreSolver2D solver(33, 1., 33, 1.);
 
 	std::vector<double> x(solver.get_local_size(), 1);
 	solver.solve(&x[0]);

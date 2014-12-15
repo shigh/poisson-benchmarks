@@ -15,7 +15,8 @@ private:
 
 	int i;
 	int myid, num_procs;
-	int N, n;
+	int N, N0, N1;
+	double Ly, Lx;
 
 	int ilower, iupper, y0, ny, nx;
 	int local_size, extra;
@@ -42,7 +43,7 @@ private:
 
 public:
 
-	HypreSolver2D();
+	HypreSolver2D(ptrdiff_t N0, double Ly, ptrdiff_t N1, double Lx);
 
 	void set_x0(double *x0);
 	
