@@ -1,5 +1,5 @@
 
-HYPRE_DIR = /home/user01/src/hypre-2.9.0b-babel/src/hypre
+HYPRE_DIR = /home/user01/src/hypre
 
 CXX         = mpic++
 CXXFLAGS    = -g -fPIC
@@ -8,7 +8,7 @@ CXXDEFS     = -DHAVE_CONFIG_H -DHYPRE_TIMING
 
 LDLIBS  = -L/home/shigh2/src/fftw/lib
 LDLIBS += -lfftw3_mpi -lfftw3 -lm
-LDLIBS += -L$(HYPRE_DIR)/lib -lHYPRE -lm
+LDLIBS += -L$(HYPRE_DIR)/lib -lHYPRE 
 
 DEPS = problem.hpp fftwlocal.hpp fftwmpi.hpp mpi_stats.hpp hypre.hpp
 OBJS = problem.o fftwlocal.o fftwmpi.o mpi_stats.o hypre.o

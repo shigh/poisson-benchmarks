@@ -83,6 +83,30 @@ cdef extern from "fftwmpi.hpp":
         int get_nz()
         int get_z0()
 
+cdef extern from "hypre.hpp":
+
+    cdef cppclass HypreSolver2D:
+
+        HypreSolver2D(ptrdiff_t N0, double Ly,
+                      ptrdiff_t N1, double Lx) except +
+
+        void solve(double *x)
+        int get_nx()
+        int get_ny()
+        int get_y0()
+
+    cdef cppclass HypreSolver3D:
+
+        HypreSolver3D(ptrdiff_t N0, double Lz,
+                      ptrdiff_t N1, double Ly,
+                      ptrdiff_t N2, double Lx) except +
+
+        void solve(double *x)
+        int get_nx()
+        int get_ny()
+        int get_nz()
+        int get_z0()
+        
 
 cdef class PyFFTWPoisson2DMPI:
     cdef FFTWPoisson2DMPI *thisptr
@@ -125,7 +149,46 @@ cdef class PyFFTWPoisson3DMPI:
     
     def solve(self, double[:,:,:] x):
         self.thisptr.solve(&x[0,0,0])
-        
+
+
+cdef class PyHypreSolver2D:
+    cdef HypreSolver2D *thisptr
+    def __cinit__(self,
+                  ptrdiff_t N0, double Ly,
+                  ptrdiff_t N1, double Lx):
+        self.thisptr = new HypreSolver2D(N0, Ly, N1, Lx)
+    def __dealloc__(self):
+        del self.thisptr
+    property nx:
+        def __get__(self): return self.thisptr.get_nx()
+    property ny:
+        def __get__(self): return self.thisptr.get_ny()
+    property y0:
+        def __get__(self): return self.thisptr.get_y0()
+    
+    def solve(self, double[:,:] x):
+        self.thisptr.solve(&x[0,0])
+
+cdef class PyHypreSolver3D:
+    cdef HypreSolver3D *thisptr
+    def __cinit__(self,
+                  ptrdiff_t N0, double Lz,
+                  ptrdiff_t N1, double Ly,
+                  ptrdiff_t N2, double Lx):
+        self.thisptr = new HypreSolver3D(N0, Lz, N1, Ly, N2, Lx)
+    def __dealloc__(self):
+        del self.thisptr
+    property nx:
+        def __get__(self): return self.thisptr.get_nx()
+    property ny:
+        def __get__(self): return self.thisptr.get_ny()
+    property nz:
+        def __get__(self): return self.thisptr.get_nz()
+    property z0:
+        def __get__(self): return self.thisptr.get_z0()
+    
+    def solve(self, double[:,:,:] x):
+        self.thisptr.solve(&x[0,0,0])
 
 
 MPIStats = namedtuple("MPIStats", ["check_mpi", "rank", "size",
