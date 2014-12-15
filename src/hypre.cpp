@@ -12,8 +12,8 @@ private:
 
 	int ilower, iupper;
 	int local_size, extra;
-
-	int print_system;
+	int num_iterations;
+	double final_res_norm;
 
 	double h, h2;
 
@@ -28,9 +28,6 @@ private:
 
 	std::vector<double> rhs_values, x_values;
 	std::vector<int> rows;
-	//double *rhs_values, *x_values;
-	//int    *rows;
-
 
 public:
 
@@ -41,10 +38,7 @@ public:
 
 		/* Default problem parameters */
 		n = 33;
-		print_system = 0;
 
-		/* Preliminaries: want at least one processor per row */
-		if (n*n < num_procs) n = sqrt(num_procs) + 1;
 		N = n*n; /* global number of rows */
 		h = 1.0/(n+1); /* mesh size*/
 		h2 = h*h;
@@ -63,11 +57,8 @@ public:
 		// Build rhs and init x
 		HYPRE_IJVectorCreate(MPI_COMM_WORLD, ilower, iupper, &b);
 		HYPRE_IJVectorSetObjectType(b, HYPRE_PARCSR);
-		HYPRE_IJVectorInitialize(b);
-
 		HYPRE_IJVectorCreate(MPI_COMM_WORLD, ilower, iupper, &x);
 		HYPRE_IJVectorSetObjectType(x, HYPRE_PARCSR);
-		HYPRE_IJVectorInitialize(x);
 
 		rhs_values.resize(local_size);
 		x_values.resize(local_size);
@@ -80,29 +71,39 @@ public:
 			rows[i] = ilower + i;
 		}
 
-		HYPRE_IJVectorSetValues(b, local_size, &rows[0], &rhs_values[0]);
-		HYPRE_IJVectorSetValues(x, local_size, &rows[0], &x_values[0]);
-
-
-		HYPRE_IJVectorAssemble(b);
-		HYPRE_IJVectorGetObject(b, (void **) &par_b);
-
-		HYPRE_IJVectorAssemble(x);
-		HYPRE_IJVectorGetObject(x, (void **) &par_x);
+		set_x0(&x_values[0]);
+		set_rhs(&rhs_values[0]);
 
 		build_A();
 		build_solver();
+		solve(&x_values[0]);
 
 	}
 
+	void set_rhs(double *rhs)
+	{
+
+		HYPRE_IJVectorInitialize(b);
+		HYPRE_IJVectorSetValues(b, local_size, &rows[0], rhs);
+		HYPRE_IJVectorAssemble(b);
+		HYPRE_IJVectorGetObject(b, (void **) &par_b);
+
+	}
+
+	void set_x0(double *x0)
+	{
+
+		HYPRE_IJVectorInitialize(x);
+		HYPRE_IJVectorSetValues(x, local_size, &rows[0], &x_values[0]);
+		HYPRE_IJVectorAssemble(x);
+		HYPRE_IJVectorGetObject(x, (void **) &par_x);
+
+	}
+	
 	void build_solver()
 	{
 
-		int num_iterations;
-		double final_res_norm;
-
 		HYPRE_BoomerAMGCreate(&solver);
-
 		//HYPRE_BoomerAMGSetPrintLevel(solver, 3);  /* print solve info + parameters */
 		HYPRE_BoomerAMGSetCoarsenType(solver, 6); /* Falgout coarsening */
 		HYPRE_BoomerAMGSetRelaxType(solver, 3);   /* G-S/Jacobi hybrid relaxation */
@@ -111,19 +112,16 @@ public:
 		HYPRE_BoomerAMGSetTol(solver, 1e-7);      /* conv. tolerance */
 
 		HYPRE_BoomerAMGSetup(solver, parcsr_A, par_b, par_x);
+	
+	}
+
+	void solve(double *x)
+	{
+
 		HYPRE_BoomerAMGSolve(solver, parcsr_A, par_b, par_x);
 
-		/* Run info - needed logging turned on */
 		HYPRE_BoomerAMGGetNumIterations(solver, &num_iterations);
 		HYPRE_BoomerAMGGetFinalRelativeResidualNorm(solver, &final_res_norm);
-		if (myid == 0)
-		{
-			printf("\n");
-			printf("Iterations = %d\n", num_iterations);
-			printf("Final Relative Residual Norm = %e\n", final_res_norm);
-			printf("\n");
-		}
-
 
 	}
 
@@ -187,6 +185,16 @@ public:
 
 	}	
 
+	int get_num_iterations()
+	{
+		return num_iterations;
+	}
+
+	double get_final_res_norm()
+	{
+		return final_res_norm;
+	}
+
 	~HypreSolver2D()
 	{
 		HYPRE_IJMatrixDestroy(A);
@@ -203,6 +211,13 @@ int hypre_solve ()
 
 	HypreSolver2D solver;
 
-   return(0);
+	int num_iterations = solver.get_num_iterations();
+	double final_res_norm = solver.get_final_res_norm();
+
+	std::cout <<  num_iterations << ' '
+			  << final_res_norm << std::endl;
+
+
+	return(0);
 }
 
