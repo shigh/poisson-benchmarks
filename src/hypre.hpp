@@ -59,3 +59,60 @@ public:
 	~HypreSolver2D();
 
 };
+
+class HypreSolver3D
+{
+
+private:
+
+	int myid, num_procs;
+	int N, N0, N1, N2;
+	double Lz, Ly, Lx, dz, dy, dx;
+
+	int ilower, iupper, z0, nz, ny, nx;
+	int local_size, extra;
+	int num_iterations;
+	double final_res_norm;
+
+	double h2;
+
+	HYPRE_IJMatrix A;
+	HYPRE_ParCSRMatrix parcsr_A;
+	HYPRE_IJVector hv_b;
+	HYPRE_ParVector par_b;
+	HYPRE_IJVector hv_x;
+	HYPRE_ParVector par_x;
+
+	HYPRE_Solver solver, precond;
+
+	std::vector<int> rows;
+
+	void set_rhs(double *rhs);	
+
+	void build_A();	
+
+public:
+
+	HypreSolver3D(ptrdiff_t N0, double Lz,
+                  ptrdiff_t N1, double Ly,
+                  ptrdiff_t N2, double Lx);
+
+	void set_x0(double *x0);
+	
+	void build_solver();
+
+	void solve(double *x);
+
+	int get_num_iterations();
+
+	double get_final_res_norm();
+
+	int get_local_size();
+	int get_z0();
+    int get_nz();
+	int get_ny();
+	int get_nx();
+
+	~HypreSolver3D();
+
+};
