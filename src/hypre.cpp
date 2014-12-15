@@ -19,9 +19,9 @@ private:
 
 	HYPRE_IJMatrix A;
 	HYPRE_ParCSRMatrix parcsr_A;
-	HYPRE_IJVector b;
+	HYPRE_IJVector hv_b;
 	HYPRE_ParVector par_b;
-	HYPRE_IJVector x;
+	HYPRE_IJVector hv_x;
 	HYPRE_ParVector par_x;
 
 	HYPRE_Solver solver, precond;
@@ -55,10 +55,10 @@ public:
 		local_size = iupper - ilower + 1;
 
 		// Build rhs and init x
-		HYPRE_IJVectorCreate(MPI_COMM_WORLD, ilower, iupper, &b);
-		HYPRE_IJVectorSetObjectType(b, HYPRE_PARCSR);
-		HYPRE_IJVectorCreate(MPI_COMM_WORLD, ilower, iupper, &x);
-		HYPRE_IJVectorSetObjectType(x, HYPRE_PARCSR);
+		HYPRE_IJVectorCreate(MPI_COMM_WORLD, ilower, iupper, &hv_b);
+		HYPRE_IJVectorSetObjectType(hv_b, HYPRE_PARCSR);
+		HYPRE_IJVectorCreate(MPI_COMM_WORLD, ilower, iupper, &hv_x);
+		HYPRE_IJVectorSetObjectType(hv_x, HYPRE_PARCSR);
 
 		rhs_values.resize(local_size);
 		x_values.resize(local_size);
@@ -82,20 +82,20 @@ public:
 	void set_rhs(double *rhs)
 	{
 
-		HYPRE_IJVectorInitialize(b);
-		HYPRE_IJVectorSetValues(b, local_size, &rows[0], rhs);
-		HYPRE_IJVectorAssemble(b);
-		HYPRE_IJVectorGetObject(b, (void **) &par_b);
+		HYPRE_IJVectorInitialize(hv_b);
+		HYPRE_IJVectorSetValues(hv_b, local_size, &rows[0], rhs);
+		HYPRE_IJVectorAssemble(hv_b);
+		HYPRE_IJVectorGetObject(hv_b, (void **) &par_b);
 
 	}
 
 	void set_x0(double *x0)
 	{
 
-		HYPRE_IJVectorInitialize(x);
-		HYPRE_IJVectorSetValues(x, local_size, &rows[0], x0);
-		HYPRE_IJVectorAssemble(x);
-		HYPRE_IJVectorGetObject(x, (void **) &par_x);
+		HYPRE_IJVectorInitialize(hv_x);
+		HYPRE_IJVectorSetValues(hv_x, local_size, &rows[0], x0);
+		HYPRE_IJVectorAssemble(hv_x);
+		HYPRE_IJVectorGetObject(hv_x, (void **) &par_x);
 
 	}
 	
@@ -114,10 +114,10 @@ public:
 	
 	}
 
-	void solve(double *x_)
+	void solve(double *x)
 	{
 
-		set_rhs(x_);
+		set_rhs(x);
 
 		HYPRE_BoomerAMGSolve(solver, parcsr_A, par_b, par_x);
 
@@ -204,8 +204,8 @@ public:
 	~HypreSolver2D()
 	{
 		HYPRE_IJMatrixDestroy(A);
-		HYPRE_IJVectorDestroy(b);
-		HYPRE_IJVectorDestroy(x);
+		HYPRE_IJVectorDestroy(hv_b);
+		HYPRE_IJVectorDestroy(hv_x);
 		HYPRE_BoomerAMGDestroy(solver);
 	}
 
