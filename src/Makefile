@@ -1,7 +1,8 @@
 
 CXX      = mpic++
 CXXFLAGS = -g -fPIC
-LDLIBS = -lfftw3_mpi -lfftw3 -lm
+LDLIBS  = -L/home/shigh2/src/fftw/lib
+LDLIBS += -lfftw3_mpi -lfftw3 -lm
 
 DEPS = problem.hpp fftwlocal.hpp fftwmpi.hpp mpi_stats.hpp
 OBJS = problem.o fftwlocal.o fftwmpi.o mpi_stats.o
