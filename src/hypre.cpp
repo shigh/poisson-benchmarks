@@ -76,7 +76,6 @@ public:
 
 		build_A();
 		build_solver();
-		solve(&x_values[0]);
 
 	}
 
@@ -94,7 +93,7 @@ public:
 	{
 
 		HYPRE_IJVectorInitialize(x);
-		HYPRE_IJVectorSetValues(x, local_size, &rows[0], &x_values[0]);
+		HYPRE_IJVectorSetValues(x, local_size, &rows[0], x0);
 		HYPRE_IJVectorAssemble(x);
 		HYPRE_IJVectorGetObject(x, (void **) &par_x);
 
@@ -115,8 +114,10 @@ public:
 	
 	}
 
-	void solve(double *x)
+	void solve(double *x_)
 	{
+
+		set_rhs(x_);
 
 		HYPRE_BoomerAMGSolve(solver, parcsr_A, par_b, par_x);
 
@@ -195,6 +196,11 @@ public:
 		return final_res_norm;
 	}
 
+	int get_local_size()
+	{
+		return local_size;
+	}
+
 	~HypreSolver2D()
 	{
 		HYPRE_IJMatrixDestroy(A);
@@ -210,6 +216,9 @@ int hypre_solve ()
 {
 
 	HypreSolver2D solver;
+
+	std::vector<double> x(solver.get_local_size(), 1);
+	solver.solve(&x[0]);
 
 	int num_iterations = solver.get_num_iterations();
 	double final_res_norm = solver.get_final_res_norm();
