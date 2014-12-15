@@ -79,16 +79,41 @@ void example_3d()
 void hypre_example_2d()
 {
 
-	HypreSolver2D solver(33, 1., 33, 1.);
+	const double Ly = 2*M_PI;
+	const double Lx = 2*M_PI;
 
-	std::vector<double> x(solver.get_local_size(), 1);
+	const ptrdiff_t N0 = 100;
+	const ptrdiff_t N1 = 100;
+
+	const double dy = Ly/(N0+1);
+	const double dx = Lx/(N1+1);
+
+	HypreSolver2D solver(N0, Ly, N1, Lx);
+
+	const int nx = solver.get_nx();
+	const int ny = solver.get_ny();
+	const int y0 = solver.get_y0();
+
+	double *x = new double[nx*ny];
+	double *s = new double[nx*ny];
+	build_problem(x, y0+1, ny, dy, 1, nx, dx, 10);
+	build_solution(s, y0+1, ny, dy, 1, nx, dx, 10);
+
+
 	solver.solve(&x[0]);
 
 	int num_iterations = solver.get_num_iterations();
 	double final_res_norm = solver.get_final_res_norm();
 
-	std::cout <<  num_iterations << ' '
+	double err = 0;
+	for(int i=0; i<nx*ny; i++)
+		err = std::max(err, std::abs(x[i]-s[i]));
+	std::cout <<  err << ' '
+			  << num_iterations << ' '
 			  << final_res_norm << std::endl;
+
+	delete x, s;
+
 
 }
 

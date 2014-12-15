@@ -42,7 +42,7 @@ HypreSolver2D::HypreSolver2D(ptrdiff_t N0_, double Ly_, ptrdiff_t N1_, double Lx
 	x_values.resize(local_size);
 	rows.resize(local_size);
 
-	for (i=0; i<local_size; i++)
+	for (int i=0; i<local_size; i++)
 	{
 		rhs_values[i] = h2;
 		x_values[i] = 0.0;
@@ -59,6 +59,9 @@ HypreSolver2D::HypreSolver2D(ptrdiff_t N0_, double Ly_, ptrdiff_t N1_, double Lx
 
 void HypreSolver2D::set_rhs(double *rhs)
 {
+
+	for(int i=0; i<local_size; i++)
+		rhs[i] = rhs[i]*h2;
 
 	HYPRE_IJVectorInitialize(hv_b);
 	HYPRE_IJVectorSetValues(hv_b, local_size, &rows[0], rhs);
@@ -99,6 +102,8 @@ void HypreSolver2D::solve(double *x)
 
 	HYPRE_BoomerAMGSolve(solver, parcsr_A, par_b, par_x);
 
+	HYPRE_IJVectorGetValues(hv_x, local_size, &rows[0], x);
+
 	HYPRE_BoomerAMGGetNumIterations(solver, &num_iterations);
 	HYPRE_BoomerAMGGetFinalRelativeResidualNorm(solver, &final_res_norm);
 
@@ -115,7 +120,7 @@ void HypreSolver2D::build_A()
 	double values[5];
 	int cols[5];
 
-	for (i = ilower; i <= iupper; i++)
+	for(int i=ilower; i<=iupper; i++)
 	{
 		nnz = 0;
 
@@ -187,6 +192,11 @@ int HypreSolver2D::get_y0()
 int HypreSolver2D::get_ny()
 {
 	return ny;
+}
+
+int HypreSolver2D::get_nx()
+{
+	return nx;
 }
 
 HypreSolver2D::~HypreSolver2D()

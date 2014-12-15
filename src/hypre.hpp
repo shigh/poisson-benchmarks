@@ -11,7 +11,6 @@ class HypreSolver2D
 
 private:
 
-	int i;
 	int myid, num_procs;
 	int N, N0, N1;
 	double Ly, Lx, dy, dx;
@@ -56,6 +55,7 @@ public:
 	int get_local_size();
 	int get_y0();
 	int get_ny();
+	int get_nx();
 
 	~HypreSolver2D();
 
